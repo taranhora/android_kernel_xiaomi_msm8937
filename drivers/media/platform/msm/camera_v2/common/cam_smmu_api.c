@@ -794,9 +794,8 @@ static int cam_smmu_map_buffer_and_add_to_list(int idx, int ion_fd,
 
 	rc = msm_dma_map_sg_lazy(iommu_cb_set.cb_info[idx].dev, table->sgl,
 			table->nents, dma_dir, buf);
-	if (rc != table->nents) {
+	if (!rc) {
 		pr_err("Error: msm_dma_map_sg_lazy failed\n");
-		rc = -ENOMEM;
 		goto err_unmap_sg;
 	}
 
@@ -834,7 +833,7 @@ static int cam_smmu_map_buffer_and_add_to_list(int idx, int ion_fd,
 	*paddr_ptr = sg_dma_address(table->sgl);
 	*len_ptr = (size_t)sg_dma_len(table->sgl);
 
-	if (!*paddr_ptr || !*len_ptr) {
+	if (!paddr_ptr) {
 		pr_err("Error: Space Allocation failed!\n");
 		rc = -ENOSPC;
 		goto err_unmap_sg;
